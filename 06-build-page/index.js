@@ -8,16 +8,13 @@ const eol = os.EOL;
 async function createDir(path) {
   try {
     await fs.promises.mkdir(path, { recursive: false });
-  } catch(err) {
-    console.error(err);
-  }
-}
-
-async function removeDir(path) {
-  try {
-    await fs.promises.rm(path, { recursive: true, force: true });
   } catch (err) {
-    console.error(err);
+    if (err.code === 'EEXIST') {
+      await fs.promises.rm(path, { recursive: true, force: true });
+      await fs.promises.mkdir(path);
+    } else {
+      console.error('The directory could not be created');
+    }
   }
 }
 
@@ -33,27 +30,21 @@ async function mergeStyles() {
     }
   }
   const cssPath = path.join(projectPath, 'style.css');
-  await fs.promises.rm(cssPath, { recursive: true, force: true });
   for (let i = 0; i < arr.length; i++) {
     await fs.promises.appendFile(cssPath, `${arr[i]}${eol}`, 'utf-8');
   }
 }
 
-async function copyFolder(origDirPath, newDirPath) {
-  createDir(newDirPath);
-  const origContent = await fs.promises.readdir(origDirPath, { withFileTypes: true });
-  for (let i = 0; i < origContent.length; i++) {
-    const origPath = path.join(origDirPath, origContent[i].name);
-    const newPath = path.join(newDirPath, origContent[i].name);
-    try {
-      if (origContent[i].isFile()) {
-        await fs.promises.copyFile(origPath, newPath);
-      }
-      if (origContent[i].isDirectory()) {
-        copyFolder(origPath, newPath);
-      }
-    } catch (err) {
-      console.error(err);
+async function copyFolder(sourceDir, destDir) {
+  await createDir(destDir);
+  const sourceContent = await fs.promises.readdir(sourceDir, { withFileTypes: true });
+  for (let i = 0; i < sourceContent.length; i++) {
+    const sourcePath = path.join(sourceDir, sourceContent[i].name);
+    const destPath = path.join(destDir, sourceContent[i].name);
+    if (sourceContent[i].isFile()) {
+      await fs.promises.copyFile(sourcePath, destPath);
+    } else {
+      copyFolder(sourcePath, destPath);
     }
   }
 }
@@ -74,7 +65,6 @@ async function createHtml() {
 }
 
 async function init() {
-  await removeDir(projectPath);
   await createDir(projectPath);
   await copyFolder(path.join(__dirname, 'assets'), path.join(projectPath, 'assets'));
   await mergeStyles();
