@@ -39,12 +39,12 @@ async function copyFolder(sourceDir, destDir) {
   await createDir(destDir);
   const sourceContent = await fs.promises.readdir(sourceDir, { withFileTypes: true });
   for (let i = 0; i < sourceContent.length; i++) {
-    const sourcePath = path.join(sourceDir, sourceContent[i].name);
-    const destPath = path.join(destDir, sourceContent[i].name);
+    const source = path.join(sourceDir, sourceContent[i].name);
+    const dest = path.join(destDir, sourceContent[i].name);
     if (sourceContent[i].isFile()) {
-      await fs.promises.copyFile(sourcePath, destPath);
+      await fs.promises.copyFile(source, dest);
     } else {
-      copyFolder(sourcePath, destPath);
+      copyFolder(source, dest);
     }
   }
 }
@@ -56,7 +56,7 @@ async function createHtml() {
   for (let i = 0; i < componentsDir.length; i++) {
     const file = componentsDir[i];
     const filePath = path.join(__dirname, 'components', file.name);
-    if (file.isFile() && path.extname(filePath) === '.html' && template.includes(file.name.match(/(.*)\./)[1])) {
+    if (file.isFile() && path.extname(filePath) === '.html' && template.includes(`{{${file.name.match(/(.*)\./)[1]}}}`)) {
       const fileContent = await fs.promises.readFile(filePath, { encoding: 'utf8' });
       template = template.replace(`{{${file.name.match(/(.*)\./)[1]}}}`, fileContent);
     }

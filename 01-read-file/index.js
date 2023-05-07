@@ -8,4 +8,4 @@ let data = '';
 
 stream.on('data', chunk => data += chunk);
 stream.on('end', () => stdout.write(data));
-stream.on('error', error => stdout.write('Error', error.message));
+stream.on('error', error => stdout.write(error.message));
