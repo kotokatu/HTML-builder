@@ -24,6 +24,6 @@ const copyFolder = async () => {
       console.error('The file could not be copied');
     }
   }
-}
+};
 
 copyFolder();

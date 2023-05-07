@@ -1,5 +1,8 @@
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
+const eol = os.EOL;
+
 async function mergeStyles() {
   const stylesContent = await fs.promises.readdir(path.join(__dirname, 'styles'), { withFileTypes: true });
   const arr = [];
@@ -14,7 +17,7 @@ async function mergeStyles() {
   const bundlePath = path.join(__dirname, 'project-dist', 'bundle.css');
   await fs.promises.rm(bundlePath, { recursive: true, force: true });
   for (let i = 0; i < arr.length; i++) {
-    await fs.promises.appendFile(bundlePath, arr[i], 'utf-8');
+    await fs.promises.appendFile(bundlePath, `${arr[i]}${eol}`, 'utf-8');
   }
 }
 
