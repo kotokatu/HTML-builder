@@ -52,16 +52,16 @@ async function copyFolder(sourceDir, destDir) {
 async function createHtml() {
   const htmlPath = path.join(__dirname, 'project-dist', 'index.html');
   let template = await fs.promises.readFile(path.join(__dirname, 'template.html'), { encoding: 'utf8' });
-  const componentsDir = await fs.promises.readdir(path.join(__dirname, 'components'), { withFileTypes: true });
-  for (let i = 0; i < componentsDir.length; i++) {
-    const file = componentsDir[i];
+  const components = await fs.promises.readdir(path.join(__dirname, 'components'), { withFileTypes: true });
+  for (let i = 0; i < components.length; i++) {
+    const file = components[i];
     const filePath = path.join(__dirname, 'components', file.name);
     if (file.isFile() && path.extname(filePath) === '.html' && template.includes(`{{${file.name.match(/(.*)\./)[1]}}}`)) {
       const fileContent = await fs.promises.readFile(filePath, { encoding: 'utf8' });
       template = template.replace(`{{${file.name.match(/(.*)\./)[1]}}}`, fileContent);
     }
   }
-  fs.promises.appendFile(htmlPath, template, 'utf-8');
+  await fs.promises.appendFile(htmlPath, template, 'utf-8');
 }
 
 async function init() {

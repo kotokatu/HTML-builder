@@ -1,20 +1,26 @@
 const fs = require('fs');
 const path = require('path');
-const { stdout, stdin, exit } = process;
-const output = path.join(__dirname, 'text.txt');
-const writeStream = fs.createWriteStream(output, 'utf-8');
+const readline = require('readline');
+const output = fs.createWriteStream(path.join(__dirname, 'text.txt'), 'utf-8');
+const rl = readline.createInterface({ input: process.stdin });
+const os = require('os');
+const eol = os.EOL;
+
+function exit() {
+  process.stdout.write(`Goodbye! Your text is in ${path.join(__dirname, 'text.txt')}`);
+  rl.close();
+  process.exit();
+}
 
 process.on('SIGINT', () => {
   exit();
 });
-process.on('exit', () => {
-  writeStream.end();
-  stdout.write(`Goodbye! Your text is in ${output}`);
+
+rl.on('line', data => {
+  if (data === 'exit') exit();
+  else output.write(data + eol);
 });
-stdout.write('Hello! Please enter text:\n');
-stdin.on('data', data => {
-  if (data.toString().trim() === 'exit') exit();
-  else writeStream.write(data);
-});
+
+process.stdout.write(`Hello! Please enter text:${eol}`);
 
 
