@@ -7,8 +7,8 @@ const os = require('os');
 const eol = os.EOL;
 
 function exit() {
-  process.stdout.write(`Goodbye! Your text is in ${path.join(__dirname, 'text.txt')}`);
   rl.close();
+  process.stdout.write(`Goodbye! Your text is in ${path.join(__dirname, 'text.txt')}`);
   process.exit();
 }
 

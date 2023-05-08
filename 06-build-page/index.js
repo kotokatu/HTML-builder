@@ -61,7 +61,7 @@ async function createHtml() {
       template = template.replace(`{{${file.name.match(/(.*)\./)[1]}}}`, fileContent);
     }
   }
-  await fs.promises.appendFile(htmlPath, template, 'utf-8');
+  await fs.promises.writeFile(htmlPath, template, 'utf-8');
 }
 
 async function init() {
